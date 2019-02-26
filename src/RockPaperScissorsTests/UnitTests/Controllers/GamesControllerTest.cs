@@ -94,5 +94,30 @@ namespace RockPaperScissorsTests
             Assert.IsType<ActionResult<StatusModel>>(result);
             Assert.Equal(Status.WaitingForPlayerTwo, result.Value.Status);
         }
+
+        [Fact]
+        public void Post_WhenPlayerOnePlayed_ReturnsWaitingForSecondPlayer()
+        {
+            var player = new PlayerModel();
+            player.Name = "Thomas";
+
+            var guid = _controller.Post(player);
+
+            var player2 = new PlayerModel();
+            player2.Name = "Sabine";
+
+            _controller.Join(guid.Value, player2);
+
+            var move = new MoveModel()
+            {
+                Name = "Thomas",
+                Move = Move.Rock
+            };
+
+            var result = _controller.Move(guid.Value, move);
+
+            Assert.IsType<ActionResult<StatusModel>>(result);
+            Assert.Equal(Status.WaitingForSecondPlayerToPlay, result.Value.Status);
+        }
     }
 }

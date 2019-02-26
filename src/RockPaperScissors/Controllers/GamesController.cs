@@ -33,8 +33,7 @@ namespace RockPaperScissors.Controllers
         [HttpGet("{id}")]
         public ActionResult<StatusModel> Status(Guid guid)
         {
-            var status = _gameService.GetStatus(guid);
-            return status;
+            return _gameService.GetStatus(guid);
         }
 
         // Post /api/games/{id}/join
@@ -42,16 +41,15 @@ namespace RockPaperScissors.Controllers
         [HttpPost("{id}/join")]
         public ActionResult<StatusModel> Join(Guid guid, [FromBody] PlayerModel player)
         {
-            var status = _gameService.JoinGame(guid, player);
-            return status;
+            return  _gameService.JoinGame(guid, player);
         }
 
         // Post /api/games/{id}/move
         // Make your move
         [HttpPost("{id}/move")]
-        public ActionResult<IEnumerable<string>> Move(int id)
+        public ActionResult<StatusModel> Move(Guid guid, [FromBody] MoveModel move)
         {
-            return new string[] { id.ToString(), "value2" };
+            return _gameService.MakeMove(guid, move);
         }
 
 

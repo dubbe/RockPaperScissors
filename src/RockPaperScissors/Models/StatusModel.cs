@@ -13,6 +13,8 @@ namespace RockPaperScissors.Models
     public class StatusModel
     {
         public Status Status { get; set; }
+        public PlayerModel PlayerOne { get; set; }
+        public PlayerModel PlayerTwo { get; set; }
         public StatusModel()
         {
 

@@ -47,6 +47,17 @@ namespace RockPaperScissors.Services
             return game.GetStatus();
         }
 
+        public StatusModel MakeMove(Guid guid, MoveModel move)
+        {
+            var game = _getGame(guid);
+            if(game == null)
+            {
+                return new StatusModel(Status.GameNotFound);
+            }
+            // Some error handling to se of player already made a move!
+            game.MakeMove(move);
+        }
+
         public IList<GameModel> GetGames()
         {
             return _games;

@@ -27,6 +27,11 @@ namespace RockPaperScissors.Models
             _status = new StatusModel(Status.WaitingForPlayerTwo);
         }
 
+        public void MakeMove(MoveModel move)
+        {
+            
+        }
+
         public StatusModel GetStatus()
         {
             return _status;

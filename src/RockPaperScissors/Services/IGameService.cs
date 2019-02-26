@@ -8,8 +8,8 @@ namespace RockPaperScissors.Services
     {
         GameModel StartGame(PlayerModel player);
         IList<GameModel> GetGames();
-        StatusModel GetStatus(Guid id);
-        StatusModel JoinGame(Guid id, PlayerModel player);
-        
+        StatusModel GetStatus(Guid guid);
+        StatusModel JoinGame(Guid guid, PlayerModel player);
+        StatusModel MakeMove(Guid guid, MoveModel move);
     }
 }
