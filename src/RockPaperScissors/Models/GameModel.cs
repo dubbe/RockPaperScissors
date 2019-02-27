@@ -95,8 +95,8 @@ namespace RockPaperScissors.Models
             GameStatus status = _getGameStatus();
             switch(status)
             {
-                GameStatus.GameFinished:
-                    
+                case GameStatus.GameFinished:
+                    return new StatusModel(status);
                 default:
                     return new StatusModel(status);
             }
