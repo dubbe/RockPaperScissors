@@ -56,6 +56,8 @@ namespace RockPaperScissors.Services
             }
             // Some error handling to se of player already made a move!
             game.MakeMove(move);
+            return new StatusModel(Status.GameNotFound);
+
         }
 
         public IList<GameModel> GetGames()
