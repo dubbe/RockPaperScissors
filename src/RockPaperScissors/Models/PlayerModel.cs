@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+
 namespace RockPaperScissors.Models
 {
     public enum PlayerMove
@@ -8,7 +10,9 @@ namespace RockPaperScissors.Models
     public class PlayerModel
     {
 
+        [Required]
         public string Name { get; set; }
+
         public PlayerMove? Move { get; set; }
         public PlayerStatus Status { get; set; }
 

@@ -23,7 +23,6 @@ namespace RockPaperScissors.Controllers
         [HttpPost]
         public ActionResult<Guid> Post([FromBody] PlayerModel player)
         {
-
             // Create the game
             var game = _gameService.StartGame(player);
             return game.Id;
@@ -34,7 +33,6 @@ namespace RockPaperScissors.Controllers
         [HttpGet("{id}")]
         public ActionResult<StatusModel> Status(Guid guid)
         {
-
 
             GameModel game = _gameService.GetGame(guid);
             if(game == null)
@@ -48,7 +46,7 @@ namespace RockPaperScissors.Controllers
         // GET /api/games/{id}
         // Get status of game
         [HttpGet("{id}")]
-        public ActionResult<StatusModel> Status(Guid guid, [FromBody] PlayerModel player)
+        public ActionResult<StatusModel> Status(Guid guid)
         {
             GameModel game = _gameService.GetGame(guid);
             if (game == null)
@@ -57,12 +55,7 @@ namespace RockPaperScissors.Controllers
                 return new StatusModel(GameStatus.GameNotFound);
             }
 
-            player = game.GetPlayer(player.Name);
-            if (player == null)
-            {
-                return new StatusModel(GameStatus.PlayerNotFoundInGame);
-            }
-            return game.GetStatus(player);
+            return game.GetStatus();
         }
 
         // Post /api/games/{id}/join

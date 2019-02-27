@@ -13,6 +13,7 @@
     <Folder Include="UnitTests\" />
     <Folder Include="UnitTests\Controllers\" />
     <Folder Include="UnitTests\Models\" />
+    <Folder Include="IntegrationTests\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
@@ -21,5 +22,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="2.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="CustomWebApplicationFactory.cs" />
   </ItemGroup>
 </Project>

@@ -12,19 +12,9 @@ namespace RockPaperScissors.Models
         StatusError
     }
 
-    public enum PlayerStatus
-    {
-        WaitingToPlay,
-        WaitingForOtherPlayer,
-        Win,
-        Loss,
-        Draw
-    }
-
     public class StatusModel
     {
         public GameStatus GameStatus { get; set; }
-        public PlayerStatus PlayerStatus { get; set; }
        
         public StatusModel()
         {
@@ -34,12 +24,6 @@ namespace RockPaperScissors.Models
         {
             GameStatus = gameStatus;
         }
-        public StatusModel(GameStatus gameStatus, PlayerStatus playerStatus)
-        {
-            GameStatus = gameStatus;
-            PlayerStatus = playerStatus;
-        }
-
 
     }
 }

@@ -6,32 +6,71 @@ using RockPaperScissors.Models;
 using RockPaperScissors.Services;
 using Xunit;
 
-namespace RockPaperScissorsTests
+namespace RockPaperScissorsTests.UnitTests.Controllers
 {
     public class GamesControllerTest
     {
         private IGameService _gameService;
         private GamesController _controller;
 
+        private PlayerModel _playerOne;
+        private PlayerModel _playerTwo;
+        private PlayerModel _playerThree;
+
         public GamesControllerTest()
         {
             _gameService = new GameService();
             _controller = new GamesController(_gameService);
+
+            _playerOne = new PlayerModel()
+            {
+                Name = "Thomas"
+            };
+
+            _playerTwo = new PlayerModel()
+            {
+                Name = "Sabine"
+            };
+
+            _playerThree = new PlayerModel()
+            {
+                Name = "Benjamin"
+            };
         }
 
         [Fact]
         public void Post_WhenCalled_ReturnsGuid()
         {
-            var player = new PlayerModel();
-            player.Name = "Thomas";
-            var result = _controller.Post(player);
+
+            var result = _controller.Post(_playerOne);
 
             // Check so the result is a guid
             Assert.IsType<ActionResult<Guid>>(result);
         }
 
         [Fact]
-        public void Post_WhenCalled_StatusIsNoGameFound()
+        public void Post_WhenCalledWithNoName_ReturnsNull()
+        {
+
+            var result = _controller.Post(new PlayerModel());
+
+            // Check so the result is null
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void Post_WhenCalledTwiceAndWithNoName_ReturnsTwoGames()
+        {
+            _controller.Post(_playerOne);
+            var result = _controller.Post(new PlayerModel());
+            _controller.Post(_playerTwo);
+
+            // Check so we do have two running games, 
+            Assert.Equal<int>(2, _gameService.GetGames().Count());
+        }
+
+        [Fact]
+        public void Status_WhenCalled_StatusIsNoGameFound()
         {
             var result = _controller.Status(Guid.NewGuid());
 
@@ -41,7 +80,7 @@ namespace RockPaperScissorsTests
         }
 
         [Fact]
-        public void Post_WhenCalled_StatusIsWaitingForPlayerTwo()
+        public void Status_WhenCalled_StatusIsWaitingForPlayerTwo()
         {
             var player = new PlayerModel();
             player.Name = "Thomas";
@@ -79,7 +118,7 @@ namespace RockPaperScissorsTests
         }
 
         [Fact]
-        public void Post_WhenJoined_ReturnsWaitingForAnyPlayer()
+        public void Join_WhenCalled_ReturnsWaitingForAnyPlayer()
         {
             var player = new PlayerModel();
             player.Name = "Thomas";
@@ -96,7 +135,7 @@ namespace RockPaperScissorsTests
         }
 
         [Fact]
-        public void Post_WhenPlayerOnePlayed_ReturnsWaitingForSecondPlayer()
+        public void Move_WhenPlayerOnePlayed_ReturnsWaitingForSecondPlayer()
         {
 
             var player = new PlayerModel();
@@ -121,8 +160,19 @@ namespace RockPaperScissorsTests
             Assert.Equal(GameStatus.WaitingForSecondPlayerToPlay, result.Value.GameStatus);
         }
 
-        [Fact]
-        public void Post_WhenBothPlayerPlayed_ReturnsWinForPlayerOne()
+       
+
+        [Theory]
+        [InlineData(PlayerMove.Rock, PlayerMove.Rock, PlayerStatus.Draw)]
+        [InlineData(PlayerMove.Rock, PlayerMove.Paper, PlayerStatus.Loss)]
+        [InlineData(PlayerMove.Rock, PlayerMove.Scissors, PlayerStatus.Win)]
+        [InlineData(PlayerMove.Paper, PlayerMove.Rock, PlayerStatus.Win)]
+        [InlineData(PlayerMove.Paper, PlayerMove.Paper, PlayerStatus.Draw)]
+        [InlineData(PlayerMove.Paper, PlayerMove.Scissors, PlayerStatus.Loss)]
+        [InlineData(PlayerMove.Scissors, PlayerMove.Rock, PlayerStatus.Loss)]
+        [InlineData(PlayerMove.Scissors, PlayerMove.Paper, PlayerStatus.Win)]
+        [InlineData(PlayerMove.Scissors, PlayerMove.Scissors, PlayerStatus.Draw)]
+        public void Move_WhenGameIsFinished_ReturnsWinForPlayerOne(PlayerMove playerOneMove, PlayerMove playerTwoMove, PlayerStatus expectedStatus)
         {
             var player = new PlayerModel();
             player.Name = "Thomas";
@@ -137,7 +187,7 @@ namespace RockPaperScissorsTests
             var move = new PlayerModel()
             {
                 Name = "Thomas",
-                Move = PlayerMove.Rock
+                Move = playerOneMove
             };
 
             _controller.Move(guid.Value, move);
@@ -145,7 +195,7 @@ namespace RockPaperScissorsTests
             var secondMove = new PlayerModel()
             {
                 Name = "Sabine",
-                Move = PlayerMove.Scissors
+                Move = playerTwoMove
             };
 
             _controller.Move(guid.Value, secondMove);
@@ -155,13 +205,9 @@ namespace RockPaperScissorsTests
 
             Assert.IsType<ActionResult<StatusModel>>(result);
             Assert.Equal(GameStatus.GameFinished, result.Value.GameStatus);
-            Assert.Equal(PlayerStatus.Win, result.Value.PlayerStatus);
+            Assert.Equal(expectedStatus, result.Value.PlayerStatus);
 
-            var result2 = _controller.Status(guid.Value, player2);
-
-            Assert.IsType<ActionResult<StatusModel>>(result2);
-            Assert.Equal(GameStatus.GameFinished, result2.Value.GameStatus);
-            Assert.Equal(PlayerStatus.Loss, result2.Value.PlayerStatus);
+           
         }
     }
 }
