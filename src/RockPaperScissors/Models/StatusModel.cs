@@ -4,18 +4,20 @@ namespace RockPaperScissors.Models
     public enum GameStatus
     {
         GameNotFound,
+        PlayerNotFoundInGame,
         WaitingForPlayerTwo,
         WaitingForAnyPlayerToPlay,
         WaitingForSecondPlayerToPlay,
-        GameFinished
+        GameFinished,
+        StatusError
     }
 
     public enum PlayerStatus
     {
         WaitingToPlay,
         WaitingForOtherPlayer,
-        WonGame,
-        LostGame,
+        Win,
+        Loss,
         Draw
     }
 
@@ -28,10 +30,16 @@ namespace RockPaperScissors.Models
         {
 
         }
-        public StatusModel(GameStatus status)
+        public StatusModel(GameStatus gameStatus)
         {
-            GameStatus = status;
+            GameStatus = gameStatus;
         }
+        public StatusModel(GameStatus gameStatus, PlayerStatus playerStatus)
+        {
+            GameStatus = gameStatus;
+            PlayerStatus = playerStatus;
+        }
+
 
     }
 }

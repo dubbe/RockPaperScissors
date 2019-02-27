@@ -3,13 +3,14 @@ namespace RockPaperScissors.Models
 {
     public enum PlayerMove
     {
-        Rock, Paper, Scissors
+        Rock = 0, Paper = 1, Scissors = 2
     }
     public class PlayerModel
     {
 
         public string Name { get; set; }
         public PlayerMove? Move { get; set; }
+        public PlayerStatus Status { get; set; }
 
         public PlayerModel()
         {
@@ -17,6 +18,7 @@ namespace RockPaperScissors.Models
 
         public Boolean MakeMove(PlayerMove move)
         {
+            Status = PlayerStatus.WaitingForOtherPlayer;
             if (Move != null)
             {
                 // player already made move

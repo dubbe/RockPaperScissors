@@ -9,8 +9,6 @@ namespace RockPaperScissors.Models
         public Guid Id { get; set; }
         public IList<PlayerModel> Players { get; set; }
 
-        private StatusModel _status;
-
         public GameModel(PlayerModel player)
         {
             // Generate a unique id
@@ -20,8 +18,6 @@ namespace RockPaperScissors.Models
             Players = new List<PlayerModel>();
             Players.Add(player);
 
-            // Set status to waiting for player two
-            _status = new StatusModel(GameStatus.WaitingForPlayerTwo);
         }
 
         public Boolean JoinGame(PlayerModel player)
@@ -39,30 +35,113 @@ namespace RockPaperScissors.Models
 
         public Boolean MakeMove(PlayerModel move)
         {
-            PlayerModel player = _getPlayer(move);
+            PlayerModel player = GetPlayer(move.Name);
+
             if(player == null)
             {
-                // this player is not in this game
                 return false;
             }
 
-            if(move.Move == null)
+            if (move.Move == null)
             {
                 // illegal move
                 return false;
             }
 
-            return player.MakeMove(move.Move.Value);
+            // Make the move
+            player.MakeMove(move.Move.Value);
+             
+
+            return true;
+        }
+
+        public GameStatus _getGameStatus()
+        {
+            if (Players.Count() == 1)
+            {
+                return GameStatus.WaitingForPlayerTwo;
+            }
+
+            switch (Players.Count(p => p.Move != null))
+            {
+                case 0:
+                    return GameStatus.WaitingForAnyPlayerToPlay;
+                case 1:
+                    return GameStatus.WaitingForSecondPlayerToPlay;
+                case 2:
+                    // Game is finished
+                    return GameStatus.GameFinished;
+                default:
+                    return GameStatus.StatusError;
+            }
         }
 
         public StatusModel GetStatus()
         {
-            return _status;
+            return new StatusModel(_getGameStatus());
+
         }
 
-        private PlayerModel _getPlayer(PlayerModel player)
+
+        public StatusModel GetStatus(PlayerModel player)
         {
-            return Players.FirstOrDefault(p => p.Name == player.Name);
+            player = GetPlayer(player.Name);
+            if (player == null)
+            {
+                return new StatusModel(GameStatus.PlayerNotFoundInGame);
+            }
+
+            switch (_getGameStatus())
+            {
+                case GameStatus.WaitingForPlayerTwo:
+                    return new StatusModel(GameStatus.WaitingForPlayerTwo, PlayerStatus.WaitingForOtherPlayer);
+                case GameStatus.WaitingForAnyPlayerToPlay:
+                    return new StatusModel(GameStatus.WaitingForAnyPlayerToPlay, PlayerStatus.WaitingToPlay);
+                case GameStatus.WaitingForSecondPlayerToPlay:
+                    return new StatusModel(GameStatus.WaitingForSecondPlayerToPlay, player.Move != null ? PlayerStatus.WaitingToPlay : PlayerStatus.WaitingForOtherPlayer);
+                case GameStatus.GameFinished:
+                    return new StatusModel(GameStatus.GameFinished, _getGameResult(player));
+                default:
+                    return new StatusModel(GameStatus.StatusError);
+
+            }
+           
+        }
+
+        private PlayerStatus _getGameResult(PlayerModel player)
+        {
+            PlayerModel otherPlayer = Players.FirstOrDefault(p => p.Name != player.Name);
+            return _getGameResult(player.Move.Value, otherPlayer.Move.Value);
+        }
+
+        private PlayerStatus _getGameResult(PlayerMove moveOne, PlayerMove moveTwo)
+        {
+
+            System.Diagnostics.Debug.WriteLine("testar");
+
+            if (moveOne == moveTwo)
+            {
+                return PlayerStatus.Draw;
+            } 
+
+            if (((int)moveOne + 1) % 3 == (int)moveTwo)
+            {
+                return PlayerStatus.Win;
+            }
+            else
+            {
+                return PlayerStatus.Loss;
+            }
+        }
+
+        public PlayerModel GetPlayer(string playerName)
+        {
+            if (string.IsNullOrEmpty(playerName))
+            {
+                // playername is empty
+                return null;
+            }
+            return Players.FirstOrDefault(p => p.Name == playerName);
         }
 
     }

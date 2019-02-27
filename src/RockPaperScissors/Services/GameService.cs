@@ -40,16 +40,14 @@ namespace RockPaperScissors.Services
         //    return game.GetStatus();
         //}
 
-        public StatusModel JoinGame(Guid guid, PlayerModel player)
+        public GameModel JoinGame(Guid guid, PlayerModel player)
         {
             var game = GetGame(guid);
-            if (game == null)
+            if(game != null)
             {
-                return new StatusModel(GameStatus.GameNotFound);
+                game.JoinGame(player);
             }
-
-            game.JoinGame(player);
-            return game.GetStatus();
+            return game;
         }
 
         //public StatusModel MakeMove(Guid guid, MoveModel move)

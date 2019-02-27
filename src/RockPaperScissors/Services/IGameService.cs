@@ -9,7 +9,7 @@ namespace RockPaperScissors.Services
         IList<GameModel> GetGames();
         GameModel GetGame(Guid guid);
         GameModel StartGame(PlayerModel player);
-        StatusModel JoinGame(Guid guid, PlayerModel player);
+        //StatusModel JoinGame(Guid guid, PlayerModel player);
        
     }
 }

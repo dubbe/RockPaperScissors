@@ -92,12 +92,13 @@ namespace RockPaperScissorsTests
             var result = _controller.Join(guid.Value, player2);
 
             Assert.IsType<ActionResult<StatusModel>>(result);
-            Assert.Equal(GameStatus.WaitingForPlayerTwo, result.Value.GameStatus);
+            Assert.Equal(GameStatus.WaitingForAnyPlayerToPlay, result.Value.GameStatus);
         }
 
         [Fact]
         public void Post_WhenPlayerOnePlayed_ReturnsWaitingForSecondPlayer()
         {
+
             var player = new PlayerModel();
             player.Name = "Thomas";
 
@@ -118,6 +119,52 @@ namespace RockPaperScissorsTests
 
             Assert.IsType<ActionResult<StatusModel>>(result);
             Assert.Equal(GameStatus.WaitingForSecondPlayerToPlay, result.Value.GameStatus);
+        }
+
+        [Fact]
+        public void Post_WhenBothPlayerPlayed_ReturnsWinForPlayerOne()
+        {
+
+           
+
+            var player = new PlayerModel();
+            player.Name = "Thomas";
+
+            var guid = _controller.Post(player);
+
+            var player2 = new PlayerModel();
+            player2.Name = "Sabine";
+
+            _controller.Join(guid.Value, player2);
+
+            var move = new PlayerModel()
+            {
+                Name = "Thomas",
+                Move = PlayerMove.Rock
+            };
+
+            _controller.Move(guid.Value, move);
+
+            var secondMove = new PlayerModel()
+            {
+                Name = "Sabine",
+                Move = PlayerMove.Scissors
+            };
+
+            _controller.Move(guid.Value, secondMove);
+
+
+            var result = _controller.Status(guid.Value, player);
+
+            Assert.IsType<ActionResult<StatusModel>>(result);
+            Assert.Equal(GameStatus.GameFinished, result.Value.GameStatus);
+            Assert.Equal(PlayerStatus.Win, result.Value.PlayerStatus);
+
+            var result2 = _controller.Status(guid.Value, player);
+
+            Assert.IsType<ActionResult<StatusModel>>(result2);
+            Assert.Equal(GameStatus.GameFinished, result2.Value.GameStatus);
+            Assert.Equal(PlayerStatus.Loss, result2.Value.PlayerStatus);
         }
     }
 }

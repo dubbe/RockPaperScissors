@@ -12,6 +12,7 @@
   <ItemGroup>
     <Folder Include="UnitTests\" />
     <Folder Include="UnitTests\Controllers\" />
+    <Folder Include="UnitTests\Models\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
