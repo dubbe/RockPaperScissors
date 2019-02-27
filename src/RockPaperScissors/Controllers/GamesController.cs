@@ -23,8 +23,6 @@ namespace RockPaperScissors.Controllers
         [HttpPost]
         public ActionResult<Guid> Post([FromBody] PlayerModel player)
         {
-            System.Diagnostics.Debugger.Break();
-            System.Diagnostics.Debug.WriteLine("testar");
 
             // Create the game
             var game = _gameService.StartGame(player);

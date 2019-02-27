@@ -30,7 +30,6 @@ namespace RockPaperScissors.Models
 
             Players.Add(player);
             return true;
-            //_status = new StatusModel(Status.WaitingForPlayerTwo);
         }
 
         public Boolean MakeMove(PlayerModel move)
@@ -103,7 +102,6 @@ namespace RockPaperScissors.Models
                     return new StatusModel(GameStatus.GameFinished, _getGameResult(player));
                 default:
                     return new StatusModel(GameStatus.StatusError);
-
             }
            
         }
@@ -117,8 +115,6 @@ namespace RockPaperScissors.Models
         private PlayerStatus _getGameResult(PlayerMove moveOne, PlayerMove moveTwo)
         {
 
-            System.Diagnostics.Debug.WriteLine("testar");
-
             if (moveOne == moveTwo)
             {
                 return PlayerStatus.Draw;
@@ -126,11 +122,11 @@ namespace RockPaperScissors.Models
 
             if (((int)moveOne + 1) % 3 == (int)moveTwo)
             {
-                return PlayerStatus.Win;
+                return PlayerStatus.Loss;
             }
             else
             {
-                return PlayerStatus.Loss;
+                return PlayerStatus.Win;
             }
         }
 

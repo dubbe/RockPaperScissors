@@ -124,9 +124,6 @@ namespace RockPaperScissorsTests
         [Fact]
         public void Post_WhenBothPlayerPlayed_ReturnsWinForPlayerOne()
         {
-
-           
-
             var player = new PlayerModel();
             player.Name = "Thomas";
 
@@ -160,7 +157,7 @@ namespace RockPaperScissorsTests
             Assert.Equal(GameStatus.GameFinished, result.Value.GameStatus);
             Assert.Equal(PlayerStatus.Win, result.Value.PlayerStatus);
 
-            var result2 = _controller.Status(guid.Value, player);
+            var result2 = _controller.Status(guid.Value, player2);
 
             Assert.IsType<ActionResult<StatusModel>>(result2);
             Assert.Equal(GameStatus.GameFinished, result2.Value.GameStatus);
