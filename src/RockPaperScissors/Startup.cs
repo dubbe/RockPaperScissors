@@ -28,6 +28,7 @@ namespace RockPaperScissors
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            // Injections
             services.AddSingleton<IGameService, GameService>();
         }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 namespace RockPaperScissors.Models
 {
-    public enum Status
+    public enum GameStatus
     {
         GameNotFound,
         WaitingForPlayerTwo,
@@ -10,18 +10,27 @@ namespace RockPaperScissors.Models
         GameFinished
     }
 
+    public enum PlayerStatus
+    {
+        WaitingToPlay,
+        WaitingForOtherPlayer,
+        WonGame,
+        LostGame,
+        Draw
+    }
+
     public class StatusModel
     {
-        public Status Status { get; set; }
-        public PlayerModel PlayerOne { get; set; }
-        public PlayerModel PlayerTwo { get; set; }
+        public GameStatus GameStatus { get; set; }
+        public PlayerStatus PlayerStatus { get; set; }
+       
         public StatusModel()
         {
 
         }
-        public StatusModel(Status status)
+        public StatusModel(GameStatus status)
         {
-            Status = status;
+            GameStatus = status;
         }
 
     }

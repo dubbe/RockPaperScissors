@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace RockPaperScissors.Models
 {
     public class GameModel
     {
         public Guid Id { get; set; }
-        public PlayerModel PlayerOne { get; set; }
-        public PlayerModel PlayerTwo { get; set; }
+        public IList<PlayerModel> Players { get; set; }
 
         private StatusModel _status;
 
@@ -14,27 +16,53 @@ namespace RockPaperScissors.Models
             // Generate a unique id
             Id = Guid.NewGuid();
 
-            // Add the first player
-            PlayerOne = player;
+            // Initialize players and add first player
+            Players = new List<PlayerModel>();
+            Players.Add(player);
 
             // Set status to waiting for player two
-            _status = new StatusModel(Status.WaitingForPlayerTwo);
+            _status = new StatusModel(GameStatus.WaitingForPlayerTwo);
         }
 
-        public void JoinGame(PlayerModel player)
+        public Boolean JoinGame(PlayerModel player)
         {
-            PlayerTwo = player;
-            _status = new StatusModel(Status.WaitingForPlayerTwo);
+            if(Players.Count >= 2)
+            {
+                // Max number of players reached
+                return false;
+            }
+
+            Players.Add(player);
+            return true;
+            //_status = new StatusModel(Status.WaitingForPlayerTwo);
         }
 
-        public void MakeMove(MoveModel move)
+        public Boolean MakeMove(PlayerModel move)
         {
-            
+            PlayerModel player = _getPlayer(move);
+            if(player == null)
+            {
+                // this player is not in this game
+                return false;
+            }
+
+            if(move.Move == null)
+            {
+                // illegal move
+                return false;
+            }
+
+            return player.MakeMove(move.Move.Value);
         }
 
         public StatusModel GetStatus()
         {
             return _status;
+        }
+
+        private PlayerModel _getPlayer(PlayerModel player)
+        {
+            return Players.FirstOrDefault(p => p.Name == player.Name);
         }
 
     }

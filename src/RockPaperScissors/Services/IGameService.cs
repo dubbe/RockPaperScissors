@@ -6,10 +6,10 @@ namespace RockPaperScissors.Services
 {
     public interface IGameService
     {
-        GameModel StartGame(PlayerModel player);
         IList<GameModel> GetGames();
-        StatusModel GetStatus(Guid guid);
+        GameModel GetGame(Guid guid);
+        GameModel StartGame(PlayerModel player);
         StatusModel JoinGame(Guid guid, PlayerModel player);
-        StatusModel MakeMove(Guid guid, MoveModel move);
+       
     }
 }

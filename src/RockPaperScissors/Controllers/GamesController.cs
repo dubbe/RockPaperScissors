@@ -33,7 +33,13 @@ namespace RockPaperScissors.Controllers
         [HttpGet("{id}")]
         public ActionResult<StatusModel> Status(Guid guid)
         {
-            return _gameService.GetStatus(guid);
+            GameModel game = _gameService.GetGame(guid);
+            if(game == null)
+            {
+                // no game found
+                return new StatusModel(Models.GameStatus.GameNotFound);
+            }
+            return game.GetStatus();
         }
 
         // Post /api/games/{id}/join
@@ -47,11 +53,20 @@ namespace RockPaperScissors.Controllers
         // Post /api/games/{id}/move
         // Make your move
         [HttpPost("{id}/move")]
-        public ActionResult<StatusModel> Move(Guid guid, [FromBody] MoveModel move)
+        public ActionResult<StatusModel> Move(Guid guid, [FromBody] PlayerModel player)
         {
-            return _gameService.MakeMove(guid, move);
+            GameModel game = _gameService.GetGame(guid);
+            if (game == null)
+            {
+                // no game found
+                return new StatusModel(Models.GameStatus.GameNotFound);
+            }
+
+            game.MakeMove(player);
+            return new StatusModel(Models.GameStatus.GameNotFound);
         }
 
 
     }
 }
+

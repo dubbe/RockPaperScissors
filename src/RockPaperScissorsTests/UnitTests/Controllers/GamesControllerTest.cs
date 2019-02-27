@@ -36,7 +36,7 @@ namespace RockPaperScissorsTests
             var result = _controller.Status(Guid.NewGuid());
 
             Assert.IsType<ActionResult<StatusModel>>(result);
-            Assert.Equal(Status.GameNotFound, result.Value.Status);
+            Assert.Equal(GameStatus.GameNotFound, result.Value.GameStatus);
 
         }
 
@@ -50,7 +50,7 @@ namespace RockPaperScissorsTests
             var result = _controller.Status(guid.Value);
 
             Assert.IsType<ActionResult<StatusModel>>(result);
-            Assert.Equal(Status.WaitingForPlayerTwo, result.Value.Status);
+            Assert.Equal(GameStatus.WaitingForPlayerTwo, result.Value.GameStatus);
             
         }
 
@@ -74,7 +74,7 @@ namespace RockPaperScissorsTests
             // Check so we don't get the same guid as well
             Assert.NotEqual(result, result2);
 
-            // Check so we do have two running games
+            // Check so we do have two running games, 
             Assert.Equal<int>(2, _gameService.GetGames().Count());
         }
 
@@ -92,7 +92,7 @@ namespace RockPaperScissorsTests
             var result = _controller.Join(guid.Value, player2);
 
             Assert.IsType<ActionResult<StatusModel>>(result);
-            Assert.Equal(Status.WaitingForPlayerTwo, result.Value.Status);
+            Assert.Equal(GameStatus.WaitingForPlayerTwo, result.Value.GameStatus);
         }
 
         [Fact]
@@ -108,16 +108,16 @@ namespace RockPaperScissorsTests
 
             _controller.Join(guid.Value, player2);
 
-            var move = new MoveModel()
+            var move = new PlayerModel()
             {
                 Name = "Thomas",
-                Move = Move.Rock
+                Move = PlayerMove.Rock
             };
 
             var result = _controller.Move(guid.Value, move);
 
             Assert.IsType<ActionResult<StatusModel>>(result);
-            Assert.Equal(Status.WaitingForSecondPlayerToPlay, result.Value.Status);
+            Assert.Equal(GameStatus.WaitingForSecondPlayerToPlay, result.Value.GameStatus);
         }
     }
 }
