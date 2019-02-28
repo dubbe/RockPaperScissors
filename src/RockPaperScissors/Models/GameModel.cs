@@ -11,6 +11,7 @@ namespace RockPaperScissors.Models
     {
         public Guid Id { get; set; }
         public IList<PlayerModel> Players { get; set; }
+        public string ErrorMessage { get; set; }
 
 
 
@@ -45,12 +46,14 @@ namespace RockPaperScissors.Models
             if(Players.Any(p => p.Name == player.Name))
             {
                 // Cannot add two players with the same name
+                ErrorMessage = "Cannot add two players with the same name";
                 return false;
             }
 
             if (Players.Count >= 2)
             {
                 // Max number of players reached
+                ErrorMessage = "Max number of players reached";
                 return false;
             }
 
@@ -96,9 +99,9 @@ namespace RockPaperScissors.Models
             switch(status)
             {
                 case GameStatus.GameFinished:
-                    return new StatusModel(status);
+                    return new StatusModel(Id, status);
                 default:
-                    return new StatusModel(status);
+                    return new StatusModel(Id, status);
             }
 
         }

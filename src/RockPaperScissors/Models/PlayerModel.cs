@@ -5,8 +5,19 @@ namespace RockPaperScissors.Models
 {
     public enum PlayerMove
     {
-        Rock = 0, Paper = 1, Scissors = 2
+        Rock = 0, 
+        Paper = 1, 
+        Scissors = 2
     }
+
+    public enum PlayerStatus {
+        HasNotMadeMove,
+        HasMadeMove,
+        Win,
+        Loss,
+        Draw
+    }
+
     public class PlayerModel
     {
 
@@ -18,11 +29,12 @@ namespace RockPaperScissors.Models
 
         public PlayerModel()
         {
+            Status = PlayerStatus.HasNotMadeMove;
         }
 
         public Boolean MakeMove(PlayerMove move)
         {
-            Status = PlayerStatus.WaitingForOtherPlayer;
+            Status = PlayerStatus.HasMadeMove;
             if (Move != null)
             {
                 // player already made move

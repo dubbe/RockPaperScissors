@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+
 namespace RockPaperScissors.Models
 {
     public enum GameStatus
@@ -14,14 +16,17 @@ namespace RockPaperScissors.Models
 
     public class StatusModel
     {
+        public Guid Id { get; set; }
         public GameStatus GameStatus { get; set; }
-       
+        public IList<PlayerModel> Players {get;set;}
+        
         public StatusModel()
         {
 
         }
-        public StatusModel(GameStatus gameStatus)
+        public StatusModel(Guid id, GameStatus gameStatus)
         {
+            Id = id;
             GameStatus = gameStatus;
         }
 

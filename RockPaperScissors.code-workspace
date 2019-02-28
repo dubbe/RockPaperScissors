@@ -1,0 +1,10 @@
+{
+	"folders": [
+		{
+			"path": "src"
+		}
+	],
+	"settings": {
+		"dotnet-test-explorer.testProjectPath": "/RockPaperScissorsTests/"
+	}
+}
