@@ -13,8 +13,6 @@ namespace RockPaperScissors.Models
         public IList<PlayerModel> Players { get; set; }
         public string ErrorMessage { get; set; }
 
-
-
         /// <summary>
         ///  Constructor for the gamemodel
         /// </summary>
@@ -67,7 +65,7 @@ namespace RockPaperScissors.Models
         }
 
         /// <summary>
-        /// Makes the move.
+        /// Makes the move. Nothing fancy, just updates the player object with the move
         /// </summary>
         /// <returns><c>true</c>, if move was made, <c>false</c> otherwise.</returns>
         /// <param name="move">Move.</param>
@@ -110,7 +108,7 @@ namespace RockPaperScissors.Models
 
       
         /// <summary>
-        /// Gets the player. 
+        /// Gets the player based on the name
         /// </summary>
         /// <returns>The player.</returns>
         /// <param name="playerName">Player name.</param>
@@ -127,16 +125,20 @@ namespace RockPaperScissors.Models
 
         /// <summary>
         /// Runs the game and sets the result on the players
+        /// This is the whole-game mecanics really. A check using a modulus operator on player one and giving each move a number
+        /// 0-2 makes it possible to check if player twos move won over player one. 
         /// </summary>
         private void _getGameResult()
         {
             if(Players.Count() != 2) {
-                // Has to have two players to work..
+                // Has to have two players to work.
                 ErrorMessage = "Cannot get result from game without two players";
                 return;
             }
+
             PlayerModel playerOne = Players[0];
             PlayerModel playerTwo = Players[1];
+
             if (playerOne.GetMove() == playerTwo.GetMove())
             {
                 playerOne.SetStatus(PlayerStatus.Draw);
@@ -156,7 +158,7 @@ namespace RockPaperScissors.Models
         }
 
         /// <summary>
-        /// Gets the game status.
+        /// Gets the game status. That is what state the game are in right now.
         /// </summary>
         /// <returns>The game status.</returns>
         public GameStatus _getGameStatus()
