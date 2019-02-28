@@ -1,10 +1,10 @@
 {
 	"folders": [
 		{
-			"path": "src"
+			"path": "."
 		}
 	],
 	"settings": {
-		"dotnet-test-explorer.testProjectPath": "/RockPaperScissorsTests/"
+		"dotnet-test-explorer.testProjectPath": "/src/RockPaperScissorsTests/"
 	}
 }

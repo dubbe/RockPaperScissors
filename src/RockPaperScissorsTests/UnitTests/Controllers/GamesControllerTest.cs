@@ -13,26 +13,26 @@ namespace RockPaperScissorsTests.UnitTests.Controllers
         private IGameService _gameService;
         private GamesController _controller;
 
-        private PlayerModel _playerOne;
-        private PlayerModel _playerTwo;
-        private PlayerModel _playerThree;
+        private Player _playerOne;
+        private Player _playerTwo;
+        private Player _playerThree;
 
         public GamesControllerTest()
         {
             _gameService = new GameService();
             _controller = new GamesController(_gameService);
 
-            _playerOne = new PlayerModel()
+            _playerOne = new Player()
             {
                 Name = "Thomas"
             };
 
-            _playerTwo = new PlayerModel()
+            _playerTwo = new Player()
             {
                 Name = "Sabine"
             };
 
-            _playerThree = new PlayerModel()
+            _playerThree = new Player()
             {
                 Name = "Benjamin"
             };
@@ -49,20 +49,23 @@ namespace RockPaperScissorsTests.UnitTests.Controllers
         }
 
         [Fact]
-        public void Post_WhenCalledWithNoName_ReturnsNull()
+        public void Post_WhenCalledWithNoName_ReturnsStatusCode500()
         {
 
-             var result = _controller.Post(new PlayerModel());
+             var result = _controller.Post(new Player());
 
-            // Check so the result is null
-            Assert.Null(result);
+            var objectResult = result.Result as ObjectResult;
+            Assert.NotNull(objectResult);
+
+            // Check so statuscode is 500
+            Assert.Equal("500", objectResult.StatusCode.Value.ToString());
         }
 
         [Fact]
         public void Post_WhenCalledTwiceAndWithNoName_ReturnsTwoGames()
         {
             _controller.Post(_playerOne);
-            var result = _controller.Post(new PlayerModel());
+            var result = _controller.Post(new Player());
             _controller.Post(_playerTwo);
 
             // Check so we do have two running games, 
@@ -70,43 +73,28 @@ namespace RockPaperScissorsTests.UnitTests.Controllers
         }
 
         [Fact]
-        public void Status_WhenCalled_StatusIsNoGameFound()
-        {
-            var result = _controller.Status(Guid.NewGuid());
-
-            Assert.IsType<ActionResult<StatusModel>>(result);
-            Assert.Equal(GameStatus.GameNotFound, result.Value.GameStatus);
-
-        }
-
-        [Fact]
         public void Status_WhenCalled_StatusIsWaitingForPlayerTwo()
         {
-            var player = new PlayerModel();
-            player.Name = "Thomas";
-            var guid = _controller.Post(player);
 
-            var result = _controller.Status(guid.Value);
+            var guid = _controller.Post(_playerOne);
+
+            var result = _controller.Status(guid.Value.ToString());
 
             Assert.IsType<ActionResult<StatusModel>>(result);
-            Assert.Equal(GameStatus.WaitingForPlayerTwo, result.Value.GameStatus);
+            Assert.Equal(GameStatus.WaitingForPlayerTwo.ToDescriptionString(), result.Value.Status);
             
         }
 
         [Fact]
         public void Post_WhenCalledTwice_ReturnsGuidAndTwoActiveGames()
         {
-            var player = new PlayerModel();
-            player.Name = "Thomas";
 
-            var result = _controller.Post(player);
+            var result = _controller.Post(_playerOne);
 
             Assert.IsType<ActionResult<Guid>>(result);
 
-            var player2 = new PlayerModel();
-            player2.Name = "Sabine";
 
-            var result2 = _controller.Post(player);
+            var result2 = _controller.Post(_playerTwo);
 
             Assert.IsType<ActionResult<Guid>>(result2);
 
@@ -120,44 +108,36 @@ namespace RockPaperScissorsTests.UnitTests.Controllers
         [Fact]
         public void Join_WhenCalled_ReturnsWaitingForAnyPlayer()
         {
-            var player = new PlayerModel();
-            player.Name = "Thomas";
+            var guid = _controller.Post(_playerOne);
 
-            var guid = _controller.Post(player);
+            var result = _controller.Join(guid.Value.ToString(), _playerTwo);
 
-            var player2 = new PlayerModel();
-            player2.Name = "Sabine";
+            var okObject = result as OkObjectResult;
 
-            var result = _controller.Join(guid.Value, player2);
+            Assert.NotNull(okObject);
+            
+            var status = okObject.Value as StatusModel;
 
-            Assert.IsType<ActionResult<StatusModel>>(result);
-            Assert.Equal(GameStatus.WaitingForAnyPlayerToPlay, result.Value.GameStatus);
+            Assert.Equal(GameStatus.WaitingForAnyPlayerToPlay.ToDescriptionString(), status.Status);
         }
 
         [Fact]
         public void Move_WhenPlayerOnePlayed_ReturnsWaitingForSecondPlayer()
         {
+            var guid = _controller.Post(_playerOne);
 
-            var player = new PlayerModel();
-            player.Name = "Thomas";
+            _controller.Join(guid.Value.ToString(), _playerTwo);
 
-            var guid = _controller.Post(player);
-
-            var player2 = new PlayerModel();
-            player2.Name = "Sabine";
-
-            _controller.Join(guid.Value, player2);
-
-            var move = new PlayerModel()
+            var move = new GameMove()
             {
                 Name = "Thomas",
                 Move = PlayerMove.Rock
             };
 
-            var result = _controller.Move(guid.Value, move);
+            var result = _controller.Move(guid.Value.ToString(), move);
 
             Assert.IsType<ActionResult<StatusModel>>(result);
-            Assert.Equal(GameStatus.WaitingForSecondPlayerToPlay, result.Value.GameStatus);
+            Assert.Equal(GameStatus.WaitingForSecondPlayerToPlay.ToDescriptionString(), result.Value.Status);
         }
 
        
@@ -174,38 +154,32 @@ namespace RockPaperScissorsTests.UnitTests.Controllers
         [InlineData(PlayerMove.Scissors, PlayerMove.Scissors, PlayerStatus.Draw)]
         public void Move_WhenGameIsFinished_ReturnsWinForPlayerOne(PlayerMove playerOneMove, PlayerMove playerTwoMove, PlayerStatus expectedStatus)
         {
-            var player = new PlayerModel();
-            player.Name = "Thomas";
 
-            var guid = _controller.Post(player);
+            var guid = _controller.Post(_playerOne);
 
-            var player2 = new PlayerModel();
-            player2.Name = "Sabine";
+            _controller.Join(guid.Value.ToString(), _playerTwo);
 
-            _controller.Join(guid.Value, player2);
-
-            var move = new PlayerModel()
-            {
-                Name = "Thomas",
+            GameMove moveOne = new GameMove() {
+                Name = _playerOne.Name,
                 Move = playerOneMove
             };
 
-            _controller.Move(guid.Value, move);
+            _controller.Move(guid.Value.ToString(), moveOne);
 
-            var secondMove = new PlayerModel()
-            {
-                Name = "Sabine",
+            GameMove moveTwo = new GameMove() {
+                Name = _playerTwo.Name,
                 Move = playerTwoMove
             };
+            _controller.Move(guid.Value.ToString(), moveTwo);
 
-            _controller.Move(guid.Value, secondMove);
-
-
-            var result = _controller.Status(guid.Value);
+            var result = _controller.Status(guid.Value.ToString());
 
             Assert.IsType<ActionResult<StatusModel>>(result);
-            Assert.Equal(GameStatus.GameFinished, result.Value.GameStatus);
-            //Assert.Equal(expectedStatus, result.Value.Players);
+            Assert.Equal(GameStatus.GameFinished.ToDescriptionString(), result.Value.Status);
+            
+            var firstPlayer = result.Value.Players.FirstOrDefault(p => p.Name == _playerOne.Name);
+            Assert.NotNull(firstPlayer);
+            Assert.Equal(expectedStatus, firstPlayer.GetStatus());
 
            
         }

@@ -19,10 +19,10 @@ namespace RockPaperScissors.Models
         ///  Constructor for the gamemodel
         /// </summary>
         /// <param name="player">Starting player.</param>
-        public GameModel(PlayerModel player)
+        public GameModel(string name)
         {
             // Cannot create game without a starting player and a name on starting player
-            if(string.IsNullOrEmpty(player.Name))
+            if(string.IsNullOrEmpty(name))
             {
                 throw new ArgumentException("Player name is required");
             }
@@ -32,7 +32,9 @@ namespace RockPaperScissors.Models
 
             // Initialize players and add first player
             Players = new List<PlayerModel>();
-            Players.Add(player);
+            Players.Add(new PlayerModel() {
+                Name = name
+            });
 
         }
 
@@ -41,9 +43,9 @@ namespace RockPaperScissors.Models
         /// </summary>
         /// <returns><c>true</c>, if game was joined, <c>false</c> otherwise.</returns>
         /// <param name="player">Player.</param>
-        public Boolean JoinGame(PlayerModel player)
+        public Boolean JoinGame(string name)
         {
-            if(Players.Any(p => p.Name == player.Name))
+            if(Players.Any(p => p.Name == name))
             {
                 // Cannot add two players with the same name
                 ErrorMessage = "Cannot add two players with the same name";
@@ -57,7 +59,9 @@ namespace RockPaperScissors.Models
                 return false;
             }
 
-            Players.Add(player);
+            Players.Add(new PlayerModel() {
+                Name = name
+            });
             return true;
         }
 
@@ -66,23 +70,17 @@ namespace RockPaperScissors.Models
         /// </summary>
         /// <returns><c>true</c>, if move was made, <c>false</c> otherwise.</returns>
         /// <param name="move">Move.</param>
-        public Boolean MakeMove(PlayerModel move)
+        public Boolean MakeMove(string name, PlayerMove move)
         {
-            PlayerModel player = GetPlayer(move.Name);
+            PlayerModel player = GetPlayer(name);
 
             if(player == null)
             {
                 return false;
             }
 
-            if (move.Move == null)
-            {
-                // illegal move
-                return false;
-            }
-
             // Make the move
-            player.MakeMove(move.Move.Value);
+            player.MakeMove(move);
              
 
             return true;
@@ -99,9 +97,10 @@ namespace RockPaperScissors.Models
             switch(status)
             {
                 case GameStatus.GameFinished:
-                    return new StatusModel(Id, status);
+                    _getGameResult();
+                    return new StatusModel(Id, status, Players);
                 default:
-                    return new StatusModel(Id, status);
+                    return new StatusModel(Id, status, Players);
             }
 
         }
@@ -123,38 +122,31 @@ namespace RockPaperScissors.Models
         }
 
         /// <summary>
-        /// Gets the game result.
+        /// Runs the game and sets the result on the players
         /// </summary>
-        /// <returns>The game result.</returns>
-        /// <param name="player">The player that requested the result.</param>
-        private PlayerStatus _getGameResult(PlayerModel player)
+        private void _getGameResult()
         {
-            PlayerModel otherPlayer = Players.FirstOrDefault(p => p.Name != player.Name);
-            return _getGameResult(player.Move.Value, otherPlayer.Move.Value);
-        }
-
-        /// <summary>
-        /// Gets the game result.
-        /// </summary>
-        /// <returns>The game result.</returns>
-        /// <param name="moveOne">Move one.</param>
-        /// <param name="moveTwo">Move two.</param>
-        private PlayerStatus _getGameResult(PlayerMove moveOne, PlayerMove moveTwo)
-        {
-
-            if (moveOne == moveTwo)
+            if(Players.Count() != 2) {
+                // Has to have two players to work...
+                return;
+            }
+            PlayerModel playerOne = Players[0];
+            PlayerModel playerTwo = Players[1];
+            if (playerOne.GetMove() == playerTwo.GetMove())
             {
-                return PlayerStatus.Draw;
-            } 
-
-            if (((int)moveOne + 1) % 3 == (int)moveTwo)
+                playerOne.SetStatus(PlayerStatus.Draw);
+                playerTwo.SetStatus(PlayerStatus.Draw);
+            } else  if (((int)playerOne.GetMove() + 1) % 3 == (int)playerTwo.GetMove())
             {
-                return PlayerStatus.Loss;
+                playerOne.SetStatus(PlayerStatus.Loss);
+                playerTwo.SetStatus(PlayerStatus.Win);
             }
             else
             {
-                return PlayerStatus.Win;
+                playerOne.SetStatus(PlayerStatus.Win);
+                playerTwo.SetStatus(PlayerStatus.Loss);
             }
+
         }
 
         /// <summary>
@@ -168,7 +160,7 @@ namespace RockPaperScissors.Models
                 return GameStatus.WaitingForPlayerTwo;
             }
 
-            switch (Players.Count(p => p.Move != null))
+            switch (Players.Count(p => p.GetMove() != null))
             {
                 case 0:
                     return GameStatus.WaitingForAnyPlayerToPlay;
@@ -178,7 +170,8 @@ namespace RockPaperScissors.Models
                     // Game is finished
                     return GameStatus.GameFinished;
                 default:
-                    return GameStatus.StatusError;
+                    ErrorMessage = "Unkown error";
+                    return GameStatus.Error;
             }
         }
 
