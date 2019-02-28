@@ -45,7 +45,7 @@ curl -k -d '{"name":"second_player"}' -H "Content-Type: application/json" -X POS
     "status":"Waiting for any player to play",
     "players":[
         {
-            "name":"thomas",
+            "name":"first_player",
             "status":"Has not made a move"
         },
         {
@@ -73,7 +73,7 @@ curl -k -d '{"name":"first_player", "move": "rock"}' -H "Content-Type: applicati
     "status":"Waiting for second player to play",
     "players":[
         {
-            "name":"thomas",
+            "name":"first_player",
             "status":"Has made a move"
         },{
             "name":"second_player",
@@ -99,7 +99,7 @@ curl -k -i -H "Accept: application/json" -H "Content-Type: application/json" -X 
     "status":"Game finished",
     "players":[
         {
-            "name":"thomas",
+            "name":"first_player",
             "status":"Played Rock and won the game"
         },{
             "name":"second_player",
