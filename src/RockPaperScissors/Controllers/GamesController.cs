@@ -40,7 +40,7 @@ namespace RockPaperScissors.Controllers
             try {
                 var game = _gameService.StartGame(player.Name);
                 return game.Id;
-            } catch(ArgumentException) {
+            } catch(Exception) {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error when creating game");
             }
         }
@@ -50,13 +50,17 @@ namespace RockPaperScissors.Controllers
         [HttpGet("{id}")]
         public ActionResult<StatusModel> Status(string id)
         {
-            GameModel game = _gameService.GetGame(id);
-            if(game == null)
-            {
-                // no game found
-                return new StatusModel(id, GameStatus.GameNotFound);
+            try {
+                GameModel game = _gameService.GetGame(id);
+                if(game == null)
+                {
+                    // no game found
+                    return new StatusModel(id, GameStatus.GameNotFound);
+                }
+                return game.GetStatus();
+            } catch(Exception) {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error when getting status");
             }
-            return game.GetStatus();
         }
         
         // Post /api/games/{id}/join
@@ -64,15 +68,19 @@ namespace RockPaperScissors.Controllers
         [HttpPost("{id}/join")]
         public IActionResult Join(string id, [FromBody] Player player)
         {
-            GameModel game = _gameService.GetGame(id);
-            
-            if (game == null)
-                return NotFound("Game not found");
+            try {
+                GameModel game = _gameService.GetGame(id);
+                
+                if (game == null)
+                    return NotFound("Game not found");
 
-            if(!game.JoinGame(player.Name))
-                return BadRequest(game.ErrorMessage);
+                if(!game.JoinGame(player.Name))
+                    return BadRequest(game.ErrorMessage);
 
-            return Ok(game.GetStatus());
+                return Ok(game.GetStatus());
+            } catch(Exception) {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error when joining game");
+            }
         }
 
         // Post /api/games/{id}/move
@@ -80,6 +88,7 @@ namespace RockPaperScissors.Controllers
         [HttpPost("{id}/move")]
         public ActionResult<StatusModel> Move(string id, [FromBody] GameMove move)
         {
+            try {
             GameModel game = _gameService.GetGame(id);
             if (game == null)
             {
@@ -89,6 +98,9 @@ namespace RockPaperScissors.Controllers
 
             game.MakeMove(move.Name, move.Move);
             return game.GetStatus();
+            } catch (Exception) {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error when executing move");
+            }
         }
 
 

@@ -4,6 +4,9 @@ using System.ComponentModel;
 
 namespace RockPaperScissors.Models
 {
+    /// <summary>
+    /// States a game can be in
+    /// </summary>
     public enum GameStatus
     {
         [Description("Game not found")]
@@ -32,6 +35,13 @@ namespace RockPaperScissors.Models
         {
 
         }
+
+        /// <summary>
+        /// Create a status from a Guid-id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="gameStatus"></param>
+        /// <param name="players">Optional, default value is null</param>
         public StatusModel(Guid id, GameStatus gameStatus, IList<PlayerModel> players = null)
         {
             Id = id;
@@ -39,6 +49,12 @@ namespace RockPaperScissors.Models
             Players = players;
         }
 
+        /// <summary>
+        /// Create a status from a string id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="gameStatus"></param>
+        /// <param name="players">Optional, default value is null</param>
         public StatusModel(string id, GameStatus gameStatus, IList<PlayerModel> players = null)
         {
             Id = new Guid(id);

@@ -24,13 +24,14 @@ namespace RockPaperScissors.Models
             // Cannot create game without a starting player and a name on starting player
             if(string.IsNullOrEmpty(name))
             {
+                // Don't want to create an instance at all, so throw an exception
                 throw new ArgumentException("Player name is required");
             }
 
             // Generate a unique id
             Id = Guid.NewGuid();
 
-            // Initialize players and add first player
+            // Initialize players-list and add first player
             Players = new List<PlayerModel>();
             Players.Add(new PlayerModel() {
                 Name = name
@@ -76,6 +77,7 @@ namespace RockPaperScissors.Models
 
             if(player == null)
             {
+                ErrorMessage = "Could not find the player in this game";
                 return false;
             }
 
@@ -97,6 +99,7 @@ namespace RockPaperScissors.Models
             switch(status)
             {
                 case GameStatus.GameFinished:
+                    // Find out who won the game
                     _getGameResult();
                     return new StatusModel(Id, status, Players);
                 default:
@@ -116,6 +119,7 @@ namespace RockPaperScissors.Models
             if (string.IsNullOrEmpty(playerName))
             {
                 // player name is empty
+                ErrorMessage = "Cannot create player without a name";
                 return null;
             }
             return Players.FirstOrDefault(p => p.Name == playerName);
@@ -127,7 +131,8 @@ namespace RockPaperScissors.Models
         private void _getGameResult()
         {
             if(Players.Count() != 2) {
-                // Has to have two players to work...
+                // Has to have two players to work..
+                ErrorMessage = "Cannot get result from game without two players";
                 return;
             }
             PlayerModel playerOne = Players[0];
@@ -146,6 +151,7 @@ namespace RockPaperScissors.Models
                 playerOne.SetStatus(PlayerStatus.Win);
                 playerTwo.SetStatus(PlayerStatus.Loss);
             }
+            return;
 
         }
 
