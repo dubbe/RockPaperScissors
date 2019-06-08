@@ -45,7 +45,7 @@ namespace RockPaperScissors
                 app.UseHsts();
             }
             
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseMvc();
         }
     }
